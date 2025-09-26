@@ -1,25 +1,25 @@
-name: CI
+name: SagZ1T2qR
 
-on:
-  push:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use ubuntu-latest for a Linux runner
+
+    runs-on: windows-latest
 
     steps:
-    - name: root
-      run: sudo su root
-    - name: ssh
-      run: |
-            sudo pip install colab_ssh
-            sudo echo "from colab_ssh import launch_ssh 
-            launch_ssh('cr_33FuTiLTad5N76kgkvzERNNBWmX', 'Mbwea1599')" > ssh.py
-            sudo python ssh.py
-            sudo usermod --password $(echo "P@ssw0rd!" | openssl passwd -1 -stdin) runneradmin
-            sudo systemctl restart ssh
-      shell: bash
-      
-    - name: Keep connected
-      run: sleep 43209
+    - name: Download Ngrok
+      run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+    - name: Extract Ngrok Archive
+      run: Expand-Archive ngrok.zip
+    - name: Auth
+      run: .\ngrok\ngrok.exe authtoken 1vOmOdz8edOyUQ545kTPo4TvXLP_3iPReiKYwn46spWoWfNex
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Enable TS
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+    - run: Set-LocalUser -Name "SagZ1T2qR" -Password (ConvertTo-SecureString -AsPlainText "SagZ1T2qR" -Force)
+    - name: Create Tunnel
+      run: .\ngrok\ngrok.exe tcp 3389
